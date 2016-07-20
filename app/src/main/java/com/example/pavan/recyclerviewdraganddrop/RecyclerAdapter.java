@@ -100,7 +100,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public class MyTouchListener implements View.OnTouchListener {
         @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
         public boolean onTouch(View view, MotionEvent motionEvent) {
-            Toast.makeText(view.getContext(), motionEvent.getAction()+"", Toast.LENGTH_SHORT).show();
+          //  Toast.makeText(view.getContext(), motionEvent.getAction()+"Action", Toast.LENGTH_SHORT).show();
             if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 String color = (view.getTag() instanceof ImageData)? "blue":"red";
                 ClipData data = ClipData.newPlainText("source", "recycler");
@@ -148,6 +148,21 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
+
+    public void addtem(AbstractDummyClass imageData, int index){
+        if(items==null)
+            items = new ArrayList<>();
+        if(imageData!=null) {
+            if(index >= items.size())
+            items.add(imageData);
+            else{
+                items.add(index,imageData);
+
+            }
+            notifyItemInserted(items.indexOf(imageData));
+        }
+    }
+
     public void move(int oldPos, int newPos){
 
     }
@@ -165,4 +180,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         if (items.get(position) instanceof ImageData) return 0;
         else return 1;
     }
+
+
+
+
+
 }

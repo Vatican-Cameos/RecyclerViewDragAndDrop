@@ -2,10 +2,12 @@ package com.example.pavan.recyclerviewdraganddrop;
 
 import android.annotation.TargetApi;
 import android.content.ClipData;
+import android.graphics.Rect;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.DragEvent;
@@ -26,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView rv;
     Button button,button2;
     private RecyclerAdapter mAdapter ;
+    LinearLayoutManager layoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,13 +41,13 @@ public class MainActivity extends AppCompatActivity {
         button.setOnTouchListener(new MyTouchListener());
         rv = (RecyclerView) findViewById(R.id.rv);
         list.add(new ImageData(R.mipmap.ic_launcher));
-        list.add(new ImaigData(R.mipmap.ic_launcher));
         list.add(new ImageData(R.mipmap.ic_launcher));
-        list.add(new ImaigData(R.mipmap.ic_launcher));
+        list.add(new ImageData(R.mipmap.ic_launcher));
+        list.add(new ImageData(R.mipmap.ic_launcher));
 
-
+        layoutManager=new LinearLayoutManager(this);
         mAdapter = new RecyclerAdapter(list);
-        rv.setLayoutManager(new LinearLayoutManager(this));
+        rv.setLayoutManager(layoutManager);
         rv.setAdapter(mAdapter);
 
 
@@ -73,6 +76,28 @@ public class MainActivity extends AppCompatActivity {
                 case DragEvent.ACTION_DROP:
                     ClipData clipData = event.getClipData();
 
+                    //krishanu's findings
+
+                    OrientationHelper helper = OrientationHelper.createVerticalHelper(layoutManager);
+
+                    int start = helper.getStartAfterPadding();
+                    int end = helper.getEndAfterPadding();
+
+
+                    int index = mAdapter.getItemCount();
+                    for (int i = 0; i < rv.getChildCount(); i++) {
+
+
+                        View child = rv.getChildAt(i);
+                        int childStart = helper.getDecoratedStart(child);
+                        int childEnd = helper.getDecoratedEnd(child);
+                        if(childStart <= event.getY() && childEnd >= event.getY()){
+                            index=i;
+
+                        }
+
+                    }
+
                     if(clipData.getDescription().getLabel().toString().equals("source")){
                         String source = clipData.getItemAt(0).getText().toString();
                         if(source.equals("panel")){
@@ -84,14 +109,14 @@ public class MainActivity extends AppCompatActivity {
                                 id=new ImaigData(R.mipmap.ic_launcher);
                             }
                             if(id!=null)
-                                mAdapter.addtem(id);
+                                mAdapter.addtem(id,index);
                         }
                         else if(source.equals("recycler")){
                             Integer position = Integer.parseInt(clipData.getItemAt(1).getHtmlText());
                             AbstractDummyClass id = mAdapter.getItemAt(position);
                             if(id!=null){
                                 mAdapter.removeItem(position);
-                                mAdapter.addtem(id);
+                                mAdapter.addtem(id,index);
                             }
                         }
                     }
